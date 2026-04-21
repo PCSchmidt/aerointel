@@ -550,7 +550,7 @@ async def aircraft_websocket(ws: WebSocket):
             # Keep alive — actual data pushed by pipeline_loop
             await asyncio.sleep(30)
             await ws.send_text(json.dumps({"type": "ping"}))
-    except WebSocketDisconnect:
+    except (WebSocketDisconnect, RuntimeError):
         pass
     finally:
         if ws in app_state.ws_connections:
