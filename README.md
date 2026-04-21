@@ -8,7 +8,7 @@
 
 ## Live Demo
 
-[aerointel.vercel.app](https://aerointel.vercel.app)
+[aerointel-git-main-chris-schmidts-projects.vercel.app](https://aerointel-git-main-chris-schmidts-projects.vercel.app)
 
 ---
 
