@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans:    'Manrope', 'Segoe UI', sans-serif;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-mono:    'JetBrains Mono', Consolas, monospace;
+
+  /* AeroIntel color system */
+  --color-bg:          #0a0c0f;
+  --color-bg-panel:    #0d1117;
+  --color-bg-input:    #070a0e;
+  --color-border:      #1e2a38;
+  --color-border-dim:  #121a24;
+
+  --color-emerald:     #34d399;
+  --color-emerald-dim: #047857;
+  --color-blue:        #4a9eff;
+  --color-red:         #ff4a4a;
+  --color-orange:      #ff6b00;
+  --color-amber:       #ffb800;
+  --color-text:        #8ab4d4;
+  --color-text-dim:    #4a7a9b;
+  --color-text-muted:  #3a5a6a;
+  --color-text-ghost:  #2a4a5a;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--color-bg);
+  font-family: var(--font-sans), sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* MapLibre canvas — prevent outline flash */
+.maplibregl-canvas:focus {
+  outline: none;
+}
+
+/* Hide MapLibre default attribution (we'll add our own) */
+.maplibregl-ctrl-attrib {
+  display: none !important;
+}
+
+/* Scrollbar styling for panels */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-panel);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-dim);
+}
+
+/* Pulsing glow animation for live indicator */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 4px #34d399, 0 0 8px #34d399; }
+  50%       { box-shadow: 0 0 2px #34d399; }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Alert flash for critical anomalies */
+@keyframes alert-flash {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+.alert-flash {
+  animation: alert-flash 1s ease-in-out infinite;
+}
+
+/* Hide horizontal scrollbar on alert banner */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Smooth panel slide transitions */
+.panel-slide-enter {
+  transform: translateX(100%);
+}
+.panel-slide-enter-active {
+  transform: translateX(0);
+  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}

@@ -1,0 +1,16 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+# Railway injects $PORT; this overrides the Dockerfile CMD so --reload is not used in production.
+startCommand = "uvicorn main:app --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+restartPolicyType = "on-failure"
+restartPolicyMaxRetries = 3
+
+# Required environment variables (set in Railway dashboard):
+#   ANTHROPIC_API_KEY       — Claude API key for anomaly explanations, NL query, situation summary
+#   OPENSKY_USERNAME        — Optional: higher rate limits (free registration at opensky-network.org)
+#   OPENSKY_PASSWORD        — Optional: paired with OPENSKY_USERNAME
