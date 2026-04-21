@@ -7,7 +7,7 @@ Covers every major capability in a natural flow with no backtracking.
 
 ## Prerequisites
 
-For the live deployment, open [aerointel-git-main-chris-schmidts-projects.vercel.app](https://aerointel-git-main-chris-schmidts-projects.vercel.app).
+For the live deployment, open [aerointel.vercel.app](https://aerointel.vercel.app).
 
 For local development, both servers must be running before the demo starts.
 
