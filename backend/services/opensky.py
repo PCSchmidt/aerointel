@@ -206,7 +206,9 @@ class OpenSkyService:
         except OpenSkyFetchError:
             raise
         except Exception as e:
-            raise OpenSkyFetchError(f"OpenSky token request error: {e}") from e
+            raise OpenSkyFetchError(
+                f"OpenSky token request error [{type(e).__name__}]: {e!r}"
+            ) from e
 
     async def fetch_states(self,
                            bbox: Optional[tuple] = None) -> list[RawAircraftState]:
@@ -271,7 +273,9 @@ class OpenSkyService:
         except OpenSkyFetchError:
             raise
         except Exception as e:
-            raise OpenSkyFetchError(f"OpenSky unexpected error: {e}") from e
+            raise OpenSkyFetchError(
+                f"OpenSky unexpected error [{type(e).__name__}]: {e!r}"
+            ) from e
 
 
 class ADSBLolService:
