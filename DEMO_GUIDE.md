@@ -7,7 +7,9 @@ Covers every major capability in a natural flow with no backtracking.
 
 ## Prerequisites
 
-Both servers must be running before the demo starts.
+For the live deployment, open [aerointel-git-main-chris-schmidts-projects.vercel.app](https://aerointel-git-main-chris-schmidts-projects.vercel.app).
+
+For local development, both servers must be running before the demo starts.
 
 ```bash
 # Terminal 1 — backend
@@ -31,13 +33,13 @@ demoing anomaly detection. The cycle counter is visible at `/api/stats`.
 
 ## Demo Script
 
-### 1. Map loads — 8,000+ aircraft globally (0:00 – 0:45)
+### 1. Map loads — 10,000+ aircraft globally (0:00 – 0:45)
 
 The map opens on a dark globe with colored aircraft markers.
 
 **Say:** "This is a live view of global airspace right now. The data
 comes directly from ADS-B transponders via the OpenSky Network — roughly
-8,000 aircraft in flight at any given time."
+10,000+ aircraft in flight at any given time."
 
 Point out the color coding in the Layers panel (left):
 - Blue dots: commercial airline traffic

@@ -11,7 +11,7 @@ scorer. Claude API surfaces natural language query parsing and situation summari
 - **ML**: filterpy Kalman filter, scikit-learn DBSCAN + IsolationForest
 - **LLM**: Anthropic Claude claude-sonnet-4-6
 - **Data**: OpenSky Network REST (commercial/private), adsb.lol (military)
-- **Deploy**: Vercel (frontend) + Railway (backend)
+- **Deploy**: Vercel (frontend) + Fly.io (backend)
 
 ## Design Standard
 

@@ -1,6 +1,6 @@
 # AeroIntel
 
-**Real-time aviation intelligence platform** — Kalman filtering for state estimation, DBSCAN clustering for behavioral pattern detection, and Claude-powered natural language querying and anomaly explanation, running against live ADS-B telemetry from 8,000+ aircraft.
+**Real-time aviation intelligence platform** — Kalman filtering for state estimation, DBSCAN clustering for behavioral pattern detection, and Claude-powered natural language querying and anomaly explanation, running against live ADS-B telemetry from 10,000+ aircraft.
 
 > Built by Chris Schmidt | [pcschmidt.github.io](https://pcschmidt.github.io)
 
@@ -8,7 +8,7 @@
 
 ## Live Demo
 
-[aerointel.vercel.app](https://aerointel.vercel.app) *(deploy after setup)*
+[aerointel-git-main-chris-schmidts-projects.vercel.app](https://aerointel-git-main-chris-schmidts-projects.vercel.app)
 
 ---
 
@@ -88,13 +88,13 @@ aerointel/
 
 ## Performance
 
-Measured on development hardware (April 2026):
+Measured on the live Fly.io deployment (April 2026):
 
 | Metric | Value |
 |--------|-------|
-| Aircraft tracked | 8,000+ |
-| Military aircraft | ~114 |
-| Pipeline cycle time | ~5.3s |
+| Aircraft tracked | 10,493 |
+| Military aircraft | 268 |
+| Pipeline cycle time | 3.5s |
 | WebSocket push latency | <100ms |
 | IsolationForest min fleet | 30 aircraft |
 | Claude explanation latency | 2–4s (on-demand) |

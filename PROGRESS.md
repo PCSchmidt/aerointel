@@ -1,6 +1,6 @@
 # AeroIntel — Progress
 
-## Status: Phase 3 In Progress
+## Status: Phase 4 In Progress
 
 ---
 
@@ -95,7 +95,8 @@
 - [x] Add `/health` endpoint to backend
 - [x] Push repo to GitHub (PCSchmidt/aerointel)
 - [x] Deploy backend to Railway
-- [ ] Deploy frontend to Vercel
+- [x] Migrate backend from Railway to Fly.io (OpenSky ConnectTimeout fix)
+- [x] Deploy frontend to Vercel
 - [x] Add card to `index.astro` (featured)
 - [x] Add full entry to `projects.astro`
 - [ ] Pin repo in GitHub profile README

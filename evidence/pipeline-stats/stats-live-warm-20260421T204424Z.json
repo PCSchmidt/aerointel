@@ -1,0 +1,20 @@
+{
+  "aircraft_count": 10311,
+  "anomaly_count": 1,
+  "cluster_tracked": 10311,
+  "kalman_tracked": 10260,
+  "last_pipeline_run": 1776804227.7882164,
+  "llm_stats": {
+    "last_request": 0.0,
+    "total_requests": 0
+  },
+  "military_count": 247,
+  "opensky_auth_mode": "oauth",
+  "opensky_configured": true,
+  "pattern_count": 82,
+  "pipeline_cycle": 6,
+  "pipeline_duration_s": 6.98,
+  "pipeline_errors": [],
+  "pipeline_warning": null,
+  "ws_connections": 0
+}
