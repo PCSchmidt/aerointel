@@ -34,6 +34,11 @@ class OpenSkyRateLimitError(Exception):
     pass
 
 
+class OpenSkyFetchError(Exception):
+    """Raised when OpenSky auth or response handling fails for non-rate-limit reasons."""
+    pass
+
+
 OPENSKY_URL = "https://opensky-network.org/api/states/all"
 OPENSKY_TOKEN_URL = (
     "https://auth.opensky-network.org/auth/realms/opensky-network/"
@@ -223,7 +228,12 @@ class OpenSkyService:
 
                 resp = await client.get(OPENSKY_URL, **kwargs)
                 resp.raise_for_status()
-                data = resp.json()
+                try:
+                    data = resp.json()
+                except ValueError as e:
+                    raise OpenSkyFetchError(
+                        "OpenSky returned a non-JSON response; upstream may be blocking the request"
+                    ) from e
 
             self._last_fetch_time = time.time()
             self._fetch_count += 1
@@ -242,14 +252,15 @@ class OpenSkyService:
                 raise OpenSkyRateLimitError(
                     f"OpenSky rate limit hit (HTTP {e.response.status_code})"
                 ) from e
-            print(f"[OpenSky] HTTP error {e.response.status_code}: {e}")
-            return []
+            raise OpenSkyFetchError(
+                f"OpenSky request failed (HTTP {e.response.status_code})"
+            ) from e
         except httpx.TimeoutException:
-            print("[OpenSky] Request timed out")
-            return []
+            raise OpenSkyFetchError("OpenSky request timed out")
+        except OpenSkyFetchError:
+            raise
         except Exception as e:
-            print(f"[OpenSky] Unexpected error: {e}")
-            return []
+            raise OpenSkyFetchError(f"OpenSky unexpected error: {e}") from e
 
 
 class ADSBLolService:

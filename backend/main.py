@@ -32,7 +32,13 @@ from models.schemas import (
     Aircraft, RegionQuery, NLQueryRequest, NLQueryResponse,
     SituationSummary, AircraftAnomaly
 )
-from services.opensky import OpenSkyService, ADSBLolService, _raw_to_aircraft, OpenSkyRateLimitError
+from services.opensky import (
+    OpenSkyService,
+    ADSBLolService,
+    _raw_to_aircraft,
+    OpenSkyRateLimitError,
+    OpenSkyFetchError,
+)
 from services.kalman import KalmanFilterService
 from services.clustering import TrajectoryClusteringService
 from services.anomaly import AnomalyDetectionService
@@ -169,11 +175,17 @@ async def run_pipeline() -> None:
         )
 
         opensky_rate_limited = False
+        opensky_fetch_failed = False
         if isinstance(raw_commercial, OpenSkyRateLimitError):
             opensky_rate_limited = True
             errors.append(str(raw_commercial))
             raw_commercial = []
+        elif isinstance(raw_commercial, OpenSkyFetchError):
+            opensky_fetch_failed = True
+            errors.append(str(raw_commercial))
+            raw_commercial = []
         elif isinstance(raw_commercial, Exception):
+            opensky_fetch_failed = True
             errors.append(f"OpenSky: {raw_commercial}")
             raw_commercial = []
         if isinstance(raw_military, Exception):
@@ -262,6 +274,31 @@ async def run_pipeline() -> None:
             app_state.pipeline_warning = (
                 "OpenSky rate limited — serving cached aircraft data"
             )
+        elif opensky_fetch_failed:
+            cached_commercial = {
+                icao: ac
+                for icao, ac in app_state.aircraft.items()
+                if not ac.is_military
+            }
+            if cached_commercial:
+                cached_commercial.update({
+                    icao: ac
+                    for icao, ac in new_aircraft.items()
+                    if ac.is_military
+                })
+                app_state.aircraft = cached_commercial
+                app_state.pipeline_warning = (
+                    "OpenSky unavailable — serving cached aircraft data"
+                )
+            else:
+                app_state.aircraft = {
+                    icao: ac
+                    for icao, ac in new_aircraft.items()
+                    if ac.is_military
+                }
+                app_state.pipeline_warning = (
+                    "OpenSky unavailable — serving military-only data"
+                )
         else:
             app_state.aircraft = new_aircraft
             app_state.pipeline_warning = None
