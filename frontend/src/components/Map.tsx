@@ -126,7 +126,7 @@ export default function AeroMap({
         id: "pattern-halos",
         type: "circle",
         source: "aircraft",
-        filter: ["!=", ["get", "pattern_label"], null],
+        filter: ["in", ["get", "pattern_label"], ["literal", ["holding", "racetrack"]]] as unknown as maplibregl.FilterSpecification,
         paint: {
           "circle-radius": 10,
           "circle-color": "transparent",
@@ -146,7 +146,7 @@ export default function AeroMap({
         id: "anomaly-halos",
         type: "circle",
         source: "aircraft",
-        filter: ["==", ["get", "has_anomaly"], true],
+        filter: ["==", "has_anomaly", true],
         paint: {
           "circle-radius": 12,
           "circle-color": "transparent",
@@ -162,7 +162,7 @@ export default function AeroMap({
         id: "aircraft-selected",
         type: "circle",
         source: "aircraft",
-        filter: ["==", ["get", "icao24"], ""],
+        filter: ["==", "icao24", ""],
         paint: {
           "circle-radius": 14,
           "circle-color": "transparent",
