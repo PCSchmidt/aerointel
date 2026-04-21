@@ -62,6 +62,10 @@ class Settings(BaseSettings):
 settings = Settings()
 
 
+def _opensky_auth_mode() -> str:
+    return "oauth" if (opensky_svc.client_id and opensky_svc.client_secret) else "anonymous"
+
+
 # ── Application state ─────────────────────────────────────────────────────────
 
 class AppState:
@@ -183,14 +187,21 @@ async def run_pipeline() -> None:
         elif isinstance(raw_commercial, OpenSkyFetchError):
             opensky_fetch_failed = True
             errors.append(str(raw_commercial))
+            print(f"[OpenSky] Fetch failed: {raw_commercial}")
             raw_commercial = []
         elif isinstance(raw_commercial, Exception):
             opensky_fetch_failed = True
             errors.append(f"OpenSky: {raw_commercial}")
+            print(f"[OpenSky] Unexpected fetch exception: {raw_commercial}")
             raw_commercial = []
         if isinstance(raw_military, Exception):
             errors.append(f"adsb.lol: {raw_military}")
             raw_military = []
+
+        print(
+            f"[Pipeline] Source counts: commercial={len(raw_commercial)} "
+            f"military={len(raw_military)} auth_mode={_opensky_auth_mode()}"
+        )
 
         all_raw = [(r, False) for r in raw_commercial] + \
                   [(r, True)  for r in raw_military]
@@ -274,6 +285,7 @@ async def run_pipeline() -> None:
             app_state.pipeline_warning = (
                 "OpenSky rate limited — serving cached aircraft data"
             )
+            print(f"[Pipeline] Warning: {app_state.pipeline_warning}")
         elif opensky_fetch_failed:
             cached_commercial = {
                 icao: ac
@@ -299,6 +311,7 @@ async def run_pipeline() -> None:
                 app_state.pipeline_warning = (
                     "OpenSky unavailable — serving military-only data"
                 )
+            print(f"[Pipeline] Warning: {app_state.pipeline_warning}")
         else:
             app_state.aircraft = new_aircraft
             app_state.pipeline_warning = None
@@ -347,6 +360,11 @@ async def pipeline_loop() -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    print(
+        "[Startup] OpenSky auth mode="
+        f"{_opensky_auth_mode()} configured="
+        f"{bool(opensky_svc.client_id and opensky_svc.client_secret)}"
+    )
     # Run one cycle immediately on startup, then start loop
     asyncio.create_task(run_pipeline())
     task = asyncio.create_task(pipeline_loop())
@@ -504,7 +522,10 @@ async def get_stats():
         "cluster_tracked":     cluster_svc.tracked_count,
         "last_pipeline_run":   app_state.last_pipeline_run,
         "pipeline_duration_s": app_state.pipeline_duration_s,
+        "pipeline_warning":    app_state.pipeline_warning,
         "pipeline_errors":     app_state.pipeline_errors,
+        "opensky_auth_mode":   _opensky_auth_mode(),
+        "opensky_configured":  bool(opensky_svc.client_id and opensky_svc.client_secret),
         "llm_stats":           llm_svc.stats,
         "ws_connections":      len(app_state.ws_connections),
         "pipeline_cycle":      _cycle_count,

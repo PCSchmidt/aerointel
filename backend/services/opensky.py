@@ -185,19 +185,28 @@ class OpenSkyService:
                     },
                 )
                 resp.raise_for_status()
-                data = resp.json()
+                try:
+                    data = resp.json()
+                except ValueError as e:
+                    raise OpenSkyFetchError(
+                        "OpenSky token endpoint returned a non-JSON response"
+                    ) from e
 
             self._access_token = data.get("access_token", "")
+            if not self._access_token:
+                raise OpenSkyFetchError("OpenSky token response did not include an access token")
             expires_in = int(data.get("expires_in", 1800))
             self._token_expires_at = now + expires_in
             return self._access_token or None
 
         except httpx.HTTPStatusError as e:
-            print(f"[OpenSky] Token request failed (HTTP {e.response.status_code}): {e}")
-            return None
+            raise OpenSkyFetchError(
+                f"OpenSky token request failed (HTTP {e.response.status_code})"
+            ) from e
+        except OpenSkyFetchError:
+            raise
         except Exception as e:
-            print(f"[OpenSky] Token request error: {e}")
-            return None
+            raise OpenSkyFetchError(f"OpenSky token request error: {e}") from e
 
     async def fetch_states(self,
                            bbox: Optional[tuple] = None) -> list[RawAircraftState]:
@@ -244,6 +253,8 @@ class OpenSkyService:
                 raw = _parse_raw_state(sv)
                 if raw and raw.latitude and raw.longitude:
                     parsed.append(raw)
+
+            print(f"[OpenSky] Retrieved {len(parsed)} aircraft states")
 
             return parsed
 
