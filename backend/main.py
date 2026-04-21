@@ -43,6 +43,8 @@ from services.llm import LLMService
 
 class Settings(BaseSettings):
     anthropic_api_key: str = ""
+    opensky_client_id: str = ""
+    opensky_client_secret: str = ""
     opensky_username: str = ""
     opensky_password: str = ""
     cors_origins: str = "http://localhost:3000"
@@ -120,8 +122,8 @@ app_state = AppState()
 # ── Services ──────────────────────────────────────────────────────────────────
 
 opensky_svc = OpenSkyService(
-    username=settings.opensky_username,
-    password=settings.opensky_password,
+    client_id=settings.opensky_client_id or settings.opensky_username,
+    client_secret=settings.opensky_client_secret or settings.opensky_password,
 )
 adsb_lol_svc = ADSBLolService()
 kalman_svc = KalmanFilterService()

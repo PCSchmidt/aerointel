@@ -3,6 +3,7 @@
 .env.local
 backend/.env
 frontend/.env.local
+credentials.json
 
 # Python
 __pycache__/

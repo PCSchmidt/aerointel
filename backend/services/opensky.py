@@ -35,6 +35,10 @@ class OpenSkyRateLimitError(Exception):
 
 
 OPENSKY_URL = "https://opensky-network.org/api/states/all"
+OPENSKY_TOKEN_URL = (
+    "https://auth.opensky-network.org/auth/realms/opensky-network/"
+    "protocol/openid-connect/token"
+)
 ADSB_LOL_MILITARY_URL = "https://api.adsb.lol/v2/mil"
 
 # Meters to feet conversion
@@ -147,10 +151,48 @@ class OpenSkyService:
     Optionally authenticated for higher rate limits.
     """
 
-    def __init__(self, username: str = "", password: str = ""):
-        self.auth = (username, password) if username else None
+    def __init__(self, client_id: str = "", client_secret: str = ""):
+        self.client_id = client_id
+        self.client_secret = client_secret
         self._last_fetch_time: float = 0.0
         self._fetch_count: int = 0
+        self._access_token: str = ""
+        self._token_expires_at: float = 0.0
+
+    async def _get_access_token(self) -> Optional[str]:
+        """Return a cached OAuth token, refreshing when near expiry."""
+        now = time.time()
+        if self._access_token and now < self._token_expires_at - 30:
+            return self._access_token
+
+        if not (self.client_id and self.client_secret):
+            return None
+
+        try:
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                resp = await client.post(
+                    OPENSKY_TOKEN_URL,
+                    headers={"Content-Type": "application/x-www-form-urlencoded"},
+                    data={
+                        "grant_type": "client_credentials",
+                        "client_id": self.client_id,
+                        "client_secret": self.client_secret,
+                    },
+                )
+                resp.raise_for_status()
+                data = resp.json()
+
+            self._access_token = data.get("access_token", "")
+            expires_in = int(data.get("expires_in", 1800))
+            self._token_expires_at = now + expires_in
+            return self._access_token or None
+
+        except httpx.HTTPStatusError as e:
+            print(f"[OpenSky] Token request failed (HTTP {e.response.status_code}): {e}")
+            return None
+        except Exception as e:
+            print(f"[OpenSky] Token request error: {e}")
+            return None
 
     async def fetch_states(self,
                            bbox: Optional[tuple] = None) -> list[RawAircraftState]:
@@ -171,10 +213,13 @@ class OpenSkyService:
             }
 
         try:
+            headers = {}
+            token = await self._get_access_token()
+            if token:
+                headers["Authorization"] = f"Bearer {token}"
+
             async with httpx.AsyncClient(timeout=15.0) as client:
-                kwargs = {"params": params}
-                if self.auth:
-                    kwargs["auth"] = self.auth
+                kwargs = {"params": params, "headers": headers}
 
                 resp = await client.get(OPENSKY_URL, **kwargs)
                 resp.raise_for_status()
