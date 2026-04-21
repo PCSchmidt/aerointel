@@ -93,10 +93,10 @@
 - [x] Create `frontend/vercel.json` (env var declarations)
 - [x] Populate `frontend/.env.local.example` with local/production URL instructions
 - [x] Add `/health` endpoint to backend
-- [ ] Push repo to GitHub (PCSchmidt/aerointel)
-- [ ] Deploy backend to Railway
+- [x] Push repo to GitHub (PCSchmidt/aerointel)
+- [x] Deploy backend to Railway
 - [ ] Deploy frontend to Vercel
-- [ ] Add card to `index.astro` (featured) — done, pending repo push
-- [ ] Add full entry to `projects.astro` — done, pending repo push
+- [x] Add card to `index.astro` (featured)
+- [x] Add full entry to `projects.astro`
 - [ ] Pin repo in GitHub profile README
 - [ ] Update "Currently Exploring" chip on portfolio
