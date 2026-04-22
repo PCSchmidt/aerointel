@@ -1,0 +1,14 @@
+{
+  "icao24": "3b776d",
+  "callsign": "CVEX28",
+  "explanation": "**CVEX28 Anomaly Analysis**\n\nThe most striking features here are the extreme altitude loss of **-13,250 ft** and a **vertical rate of -2,944 ft/min** over a 5-minute window, which together suggest a very rapid and sustained descent \u00e2\u20ac\u201d well outside normal cruise or approach profiles for most aircraft types. This is compounded by a significant speed reduction of **-119.3 knots** and a squawk code change, which could indicate the crew declared an emergency or was directed to a new code by ATC during an unplanned descent. However, heading variance remains low (0.075), suggesting controlled, directed flight rather than erratic maneuvering, and the frequent data update gap (2 seconds) indicates good surveillance coverage \u00e2\u20ac\u201d so this could represent a rapid but intentional emergency descent, an ATC-directed step-down, or in rarer cases, an upset event; further",
+  "anomaly_score": 0.0033,
+  "features": {
+    "altitude_delta_ft": -13250.0009765625,
+    "speed_delta_kts": -119.28240966796875,
+    "heading_variance": 0.07474047690629959,
+    "vertical_rate_fpm": -2944.0,
+    "update_gap_s": 2.3928046226501465,
+    "squawk_changed": true
+  }
+}

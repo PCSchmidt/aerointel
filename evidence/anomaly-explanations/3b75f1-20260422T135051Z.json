@@ -1,0 +1,14 @@
+{
+  "icao24": "3b75f1",
+  "callsign": "MET51",
+  "explanation": "**MET51 Anomaly Analysis**\n\nThe most notable features driving this anomaly are the steep vertical rate of **-3,776 ft/min** combined with an altitude loss of **-4,525 ft** over the 5-minute window, which together suggest an unusually rapid descent \u00e2\u20ac\u201d well above typical cruise or approach descent rates of ~1,000\u00e2\u20ac\u201c2,000 ft/min. The simultaneous **speed increase of 61 knots** and **moderate heading variance (0.604)** could indicate the aircraft is maneuvering while descending, potentially consistent with an emergency descent, an aggressive ATC-directed maneuver, or unusual trajectory correction. However, the stable squawk and short update gap (2 seconds) suggest normal transponder operation, and this could be a false positive representing a legitimate rapid descent procedure (e.g., emergency depressurization protocol or a steep STAR), so further",
+  "anomaly_score": 0.1127,
+  "features": {
+    "altitude_delta_ft": -4525.00048828125,
+    "speed_delta_kts": 61.05171585083008,
+    "heading_variance": 0.6040760278701782,
+    "vertical_rate_fpm": -3776.0,
+    "update_gap_s": 2.3929686546325684,
+    "squawk_changed": false
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "icao24": "480446",
+  "callsign": "GRZLY71",
+  "explanation": "**GRZLY71 Anomaly Assessment**\n\nThe combination of a **racetrack pattern** with a **squawk code change**, **significant altitude gain (1,775 ft)**, and a **simultaneous speed reduction (-25.3 kts)** is what likely drove this detection \u00e2\u20ac\u201d this profile is consistent with an aircraft entering a holding pattern or an aerial search/surveillance operation, where climbing, decelerating, and changing transponder codes during a structured orbit are operationally expected. The **heading variance is extremely low (0.009)**, which actually reinforces the racetrack interpretation \u00e2\u20ac\u201d the aircraft is flying very deliberate, repeatable tracks rather than maneuvering erratically. However, the squawk change combined with altitude shift warrants a second look, as it could also reflect ATC-directed profile changes; the anomaly score is only mildly anomalous, so this is plausibly a **",
+  "anomaly_score": 0.1624,
+  "features": {
+    "altitude_delta_ft": 1775.0,
+    "speed_delta_kts": -25.31390380859375,
+    "heading_variance": 0.00892451498657465,
+    "vertical_rate_fpm": 448.0,
+    "update_gap_s": 2.3929338455200195,
+    "squawk_changed": true
+  }
+}

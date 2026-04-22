@@ -5,7 +5,7 @@
 **Backend:** Fly.io (`aerointel-backend.fly.dev`) — migrated from Railway April 2026
 **Frontend:** Vercel (`aerointel-git-main-chris-schmidts-projects.vercel.app`)
 
-> Railway action required: the Railway service is still connected to the GitHub repo and will auto-deploy on every push. Go to Railway dashboard → service → Settings → disconnect GitHub integration (or delete the service) to stop this.
+> Railway project deleted (April 22, 2026). CI/CD now via GitHub Actions → Fly.io on push to main.
 
 ---
 
@@ -122,8 +122,11 @@
 - [x] Display 6 feature rows (altitude delta, speed delta, heading variance, vertical rate, update gap, squawk changed) above Claude narrative
 - [x] Update DEMO_GUIDE.md with Fleet Analytics and feature vector walk-through
 
-### 5.3 Evidence Capture (A4)
-- [ ] Run live system 30+ min and capture 3-5 anomaly explanation JSON responses
+### 5.3 Evidence Capture (A4) — DONE
+- [x] Run live system 30+ min and capture anomaly explanation JSON responses
+- [x] Saved 4 explanation JSONs to `evidence/anomaly-explanations/` (adff72, 480446/GRZLY71, 3b75f1/MET51, 3b776d/CVEX28)
+- [x] Saved 7 pipeline stats snapshots to `evidence/pipeline-stats/`
+- [x] Added `?force=true` param to `/api/aircraft/{icao24}/explain` for evidence capture on sub-threshold aircraft
 - [ ] Screenshot map with Fleet Analytics panel visible
 - [ ] Confirm portfolio card metrics match evidence
 

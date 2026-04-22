@@ -1,0 +1,14 @@
+{
+  "icao24": "adff72",
+  "callsign": null,
+  "explanation": "**Aircraft adff72 \u00e2\u20ac\u201c Anomaly Assessment**\n\nThe most striking features are the **vertical rate of 17,024 ft/min** and the accompanying **altitude change of 3,725 ft**, which together suggest an extremely rapid climb or descent \u00e2\u20ac\u201d well beyond typical operational rates for most aircraft (normal values rarely exceed 3,000\u00e2\u20ac\u201c4,000 ft/min even in aggressive maneuvers). The simultaneous **speed reduction of 230.6 knots** and **moderate heading variance (0.659)** could indicate an emergency descent, an unusual upset recovery, or possibly a data artifact such as transponder interpolation errors or mode-C encoding issues. It's worth noting the anomaly score (-0.070) is relatively close to the threshold, so this could be a false positive \u00e2\u20ac\u201d sensor noise or a brief data dropout can produce implausible vertical rate spikes \u00e2\u20ac\u201d and corroboration with ADS-B position data",
+  "anomaly_score": -0.0697,
+  "features": {
+    "altitude_delta_ft": 3724.99951171875,
+    "speed_delta_kts": -230.56402587890625,
+    "heading_variance": 0.6586167812347412,
+    "vertical_rate_fpm": 17024.0,
+    "update_gap_s": 12.351136207580566,
+    "squawk_changed": false
+  }
+}
