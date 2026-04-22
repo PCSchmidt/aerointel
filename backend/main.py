@@ -488,7 +488,7 @@ async def region_summary(region: RegionQuery) -> SituationSummary:
 
 
 @app.get("/api/aircraft/{icao24}/explain")
-async def explain_aircraft_anomaly(icao24: str):
+async def explain_aircraft_anomaly(icao24: str, force: bool = False):
     """
     On-demand LLM explanation for an anomalous aircraft.
 
@@ -496,15 +496,22 @@ async def explain_aircraft_anomaly(icao24: str):
     vector. Uses asyncio.to_thread() since the Anthropic client is synchronous.
 
     Only available for aircraft that have been flagged with at least one anomaly.
+    Use ?force=true to generate an explanation for any scored aircraft regardless
+    of threshold (useful for evidence capture and debugging).
     Returns 404 if the aircraft is not tracked or has no anomaly flags.
     """
     ac = app_state.aircraft.get(icao24.lower())
     if not ac:
         raise HTTPException(status_code=404, detail="Aircraft not found")
-    if not ac.anomalies:
+    if not ac.anomalies and not force:
         raise HTTPException(
             status_code=404,
             detail="No anomalies detected for this aircraft"
+        )
+    if not ac.anomaly_score:
+        raise HTTPException(
+            status_code=404,
+            detail="Aircraft has no anomaly score yet — wait for scoring cycle"
         )
 
     feature_dict = anomaly_svc.get_feature_dict(icao24.lower()) or {}
