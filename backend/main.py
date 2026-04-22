@@ -73,7 +73,8 @@ class AppState:
 
     def __init__(self):
         self.aircraft: dict[str, Aircraft] = {}       # icao24 → Aircraft
-        self.anomaly_scores: dict[str, float] = {}    # icao24 → score
+        self.anomaly_scores: dict[str, float] = {}    # icao24 → score (persists across cycles)
+        self.pattern_labels: dict[str, str] = {}      # icao24 → pattern (persists across cycles)
         self.last_pipeline_run: float = 0.0
         self.pipeline_duration_s: float = 0.0
         self.pipeline_errors: list[str] = []
@@ -244,29 +245,41 @@ async def run_pipeline() -> None:
         if _cycle_count % CLUSTER_INTERVAL_CYCLES == 0:
             for icao in active_icao24s:
                 pattern = cluster_svc.detect_pattern(icao)
-                if icao in new_aircraft and pattern:
-                    new_aircraft[icao].pattern_label = pattern.pattern_type
+                if icao in new_aircraft:
+                    if pattern:
+                        new_aircraft[icao].pattern_label = pattern.pattern_type
+                        app_state.pattern_labels[icao] = pattern.pattern_type
+                    else:
+                        # Pattern no longer detected — clear from persistent store
+                        app_state.pattern_labels.pop(icao, None)
+        else:
+            # Non-cluster cycle: carry over last known patterns
+            for icao, label in app_state.pattern_labels.items():
+                if icao in new_aircraft:
+                    new_aircraft[icao].pattern_label = label
 
         # ── Stage 6: IsolationForest anomaly scoring ─────
         if _cycle_count % ANOMALY_INTERVAL_CYCLES == 0:
             scores = anomaly_svc.fit_and_score()
             app_state.anomaly_scores = scores
 
-            for icao, score in scores.items():
-                if icao not in new_aircraft:
-                    continue
-                ac = new_aircraft[icao]
-                ac.anomaly_score = round(score, 4)
+        # Apply stored anomaly scores to all aircraft every cycle so that
+        # anomaly_score / has_anomaly persist between IsolationForest runs.
+        for icao, score in app_state.anomaly_scores.items():
+            if icao not in new_aircraft:
+                continue
+            ac = new_aircraft[icao]
+            ac.anomaly_score = round(score, 4)
 
-                # Check squawk emergency (rule-based)
-                squawk_anomaly = anomaly_svc.check_squawk(icao, ac.squawk)
-                if squawk_anomaly:
-                    ac.anomalies.append(squawk_anomaly)
+            # Check squawk emergency (rule-based — runs every cycle)
+            squawk_anomaly = anomaly_svc.check_squawk(icao, ac.squawk)
+            if squawk_anomaly:
+                ac.anomalies.append(squawk_anomaly)
 
-                # Check behavioral anomaly (ML-based)
-                behavioral = anomaly_svc.build_anomaly(icao, score)
-                if behavioral:
-                    ac.anomalies.append(behavioral)
+            # Check behavioral anomaly (ML-based — uses latest stored score)
+            behavioral = anomaly_svc.build_anomaly(icao, score)
+            if behavioral:
+                ac.anomalies.append(behavioral)
 
         # ── Stage 7: Update state ────────────────────────
         if opensky_rate_limited:
@@ -320,6 +333,16 @@ async def run_pipeline() -> None:
         kalman_svc.prune_stale()
         cluster_svc.prune_stale(active_icao24s)
         anomaly_svc.prune_stale(active_icao24s)
+        app_state.anomaly_scores = {
+            icao: score
+            for icao, score in app_state.anomaly_scores.items()
+            if icao in active_icao24s
+        }
+        app_state.pattern_labels = {
+            icao: label
+            for icao, label in app_state.pattern_labels.items()
+            if icao in active_icao24s
+        }
 
     except Exception as e:
         errors.append(f"Pipeline error: {e}")
