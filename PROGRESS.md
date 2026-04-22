@@ -1,6 +1,11 @@
 # AeroIntel — Progress
 
-## Status: Phase 4 In Progress
+## Status: Phase 5 In Progress (Phase 4 complete)
+
+**Backend:** Fly.io (`aerointel-backend.fly.dev`) — migrated from Railway April 2026
+**Frontend:** Vercel (`aerointel-git-main-chris-schmidts-projects.vercel.app`)
+
+> Railway action required: the Railway service is still connected to the GitHub repo and will auto-deploy on every push. Go to Railway dashboard → service → Settings → disconnect GitHub integration (or delete the service) to stop this.
 
 ---
 
@@ -94,10 +99,34 @@
 - [x] Populate `frontend/.env.local.example` with local/production URL instructions
 - [x] Add `/health` endpoint to backend
 - [x] Push repo to GitHub (PCSchmidt/aerointel)
-- [x] Deploy backend to Railway
+- [x] Deploy backend to Railway ~~(deprecated — migrated to Fly.io)~~
 - [x] Migrate backend from Railway to Fly.io (OpenSky ConnectTimeout fix)
+- [x] Disable Vercel Authentication (demo is public)
 - [x] Deploy frontend to Vercel
 - [x] Add card to `index.astro` (featured)
 - [x] Add full entry to `projects.astro`
 - [ ] Pin repo in GitHub profile README
 - [ ] Update "Currently Exploring" chip on portfolio
+
+## Phase 5: Intel Panel Enhancements — IN PROGRESS
+
+### 5.1 Fleet Analytics (A1) — DONE
+- [x] Poll `/api/stats` every 30s in IntelPanel
+- [x] Show aircraft / military / anomaly / pattern counts with color coding
+- [x] Show Kalman-tracked count and pipeline duration
+- [x] Show pipeline warning banner when backend sets `pipeline_warning`
+- [x] Add `cluster_tracked` and `pipeline_warning` fields to `PipelineStats` interface
+
+### 5.2 IsolationForest Feature Vector (A2) — DONE
+- [x] Store full `AnomalyExplanation` response in DetailPanel (was: explanation string only)
+- [x] Display 6 feature rows (altitude delta, speed delta, heading variance, vertical rate, update gap, squawk changed) above Claude narrative
+- [x] Update DEMO_GUIDE.md with Fleet Analytics and feature vector walk-through
+
+### 5.3 Evidence Capture (A4)
+- [ ] Run live system 30+ min and capture 3-5 anomaly explanation JSON responses
+- [ ] Screenshot map with Fleet Analytics panel visible
+- [ ] Confirm portfolio card metrics match evidence
+
+### 5.4 Pattern Drill-Down (A3)
+- [ ] Make pattern count in Fleet Analytics clickable
+- [ ] Filter aircraft list to `pattern_label !== null` and display in panel

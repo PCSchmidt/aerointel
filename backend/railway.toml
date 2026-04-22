@@ -1,3 +1,6 @@
+# DEPRECATED — backend migrated to Fly.io (April 2026).
+# Kept for reference. Active config: aerointel/fly.toml.
+
 [build]
 builder = "dockerfile"
 dockerfilePath = "Dockerfile"

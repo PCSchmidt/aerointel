@@ -1,3 +1,9 @@
+# DEPRECATED — backend migrated to Fly.io (April 2026)
+# fly.toml and Dockerfile.railway are the active deploy config.
+# This file is kept so Railway does not show a build error if the service
+# is still connected; disconnect the Railway GitHub integration to stop
+# auto-deploys: Railway dashboard → service → Settings → Source.
+
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile.railway"
