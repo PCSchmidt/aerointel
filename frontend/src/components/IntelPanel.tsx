@@ -8,8 +8,8 @@
  *   2. Region situation summary (uses currently visible region)
  */
 
-import { useState } from "react";
-import { submitNLQuery, fetchRegionSummary, SituationSummary, ViewportBounds } from "@/lib/api";
+import { useState, useEffect } from "react";
+import { submitNLQuery, fetchRegionSummary, fetchStats, SituationSummary, ViewportBounds, PipelineStats } from "@/lib/api";
 
 interface IntelPanelProps {
   aircraftCount: number;
@@ -27,6 +27,20 @@ export default function IntelPanel({ aircraftCount, onFilterApply, onClose, view
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [summary, setSummary] = useState<SituationSummary | null>(null);
   const [summaryError, setSummaryError] = useState<string | null>(null);
+
+  const [pipelineStats, setPipelineStats] = useState<PipelineStats | null>(null);
+
+  // Poll pipeline stats every 30s
+  useEffect(() => {
+    let mounted = true;
+    const poll = () =>
+      fetchStats()
+        .then((s) => { if (mounted) setPipelineStats(s); })
+        .catch(() => {});
+    poll();
+    const id = setInterval(poll, 30_000);
+    return () => { mounted = false; clearInterval(id); };
+  }, []);
 
   const handleQuery = async () => {
     if (!nlQuery.trim()) return;
@@ -87,6 +101,49 @@ export default function IntelPanel({ aircraftCount, onFilterApply, onClose, view
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-5">
+
+        {/* ── Fleet Analytics ── */}
+        <section>
+          <div className="text-[#4a7a9b] font-sans text-[10px] tracking-widest uppercase mb-3">
+            Fleet Analytics
+          </div>
+          {pipelineStats ? (
+            <>
+              <div className="grid grid-cols-2 gap-x-3 gap-y-2 mb-3">
+                {[
+                  { label: "AIRCRAFT",  value: pipelineStats.aircraft_count, color: "#4a9eff" },
+                  { label: "MILITARY",  value: pipelineStats.military_count,  color: "#ff4a4a" },
+                  { label: "ANOMALIES", value: pipelineStats.anomaly_count,   color: pipelineStats.anomaly_count > 0 ? "#ff6600" : "#3a5a6a" },
+                  { label: "PATTERNS",  value: pipelineStats.pattern_count,   color: pipelineStats.pattern_count > 0 ? "#ffb800" : "#3a5a6a" },
+                ].map(({ label, value, color }) => (
+                  <div key={label} className="bg-[#070a0e] border border-[#1e2a38] px-2 py-1.5">
+                    <div className="text-[#3a5a6a] font-mono text-[8px] uppercase tracking-wider">{label}</div>
+                    <div className="font-mono text-sm mt-0.5" style={{ color }}>{value}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <div className="flex justify-between text-[9px] font-mono">
+                  <span className="text-[#3a5a6a]">Kalman tracked</span>
+                  <span className="text-[#4a9eff]">{pipelineStats.kalman_tracked}</span>
+                </div>
+                <div className="flex justify-between text-[9px] font-mono">
+                  <span className="text-[#3a5a6a]">Pipeline</span>
+                  <span className="text-[#34d399]">{pipelineStats.pipeline_duration_s.toFixed(1)}s</span>
+                </div>
+              </div>
+              {pipelineStats.pipeline_warning && (
+                <div className="mt-2 p-2 bg-[#1a1000] border border-[#f59e0b]/30 text-[#f59e0b] font-mono text-[9px]">
+                  ⚠ {pipelineStats.pipeline_warning}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-[#3a5a6a] font-mono text-[9px] animate-pulse">Connecting...</div>
+          )}
+        </section>
+
+        <div className="border-t border-[#1e2a38]" />
 
         {/* ── NL Query ── */}
         <section>

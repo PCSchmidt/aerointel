@@ -73,8 +73,10 @@ export interface PipelineStats {
   anomaly_count: number;
   pattern_count: number;
   kalman_tracked: number;
+  cluster_tracked: number;
   last_pipeline_run: number;
   pipeline_duration_s: number;
+  pipeline_warning: string | null;
   ws_connections: number;
 }
 

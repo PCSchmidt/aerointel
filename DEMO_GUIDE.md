@@ -102,6 +102,17 @@ signals is unusual."
 
 **Read the explanation aloud** or let it speak for itself.
 
+Immediately above the Claude narrative you will see the **IsolationForest feature vector** — the six values the model scored:
+
+- **ALT Δ** — altitude change over a 5-minute window
+- **SPD Δ** — speed change over a 5-minute window
+- **HDG VAR** — heading variance (0 = steady course, 1 = random)
+- **V/S** — current vertical rate in fpm
+- **GAP** — seconds since last ADS-B contact
+- **SQUAWK** — whether the squawk code changed in the window
+
+**Say:** "This bridges the gap between 'the model flagged it' and 'here is why.' You can see the exact values that drove the score. If heading variance is high but speed is normal, that is a different story than the reverse. The Claude narrative interprets the combination."
+
 **Say:** "This is the key architectural decision: rule-based systems catch
 known patterns. Claude catches unknown unknowns — it can synthesize
 'unusual altitude + unusual routing + squawk code that changed twice in
@@ -113,6 +124,14 @@ known patterns. Claude catches unknown unknowns — it can synthesize
 
 Click the **AI INTEL** button (top-right of status bar).
 The IntelPanel slides in from the right.
+
+At the top of the panel is the **Fleet Analytics** section, which polls `/api/stats` every 30 seconds automatically. Point out:
+
+- Aircraft / military / anomaly / pattern counts with color coding — blue for commercial, red for military, orange for anomalies, yellow for patterns
+- Kalman-tracked count and current pipeline duration
+- A pipeline warning banner (amber) if the backend flagged a data quality issue
+
+**Say:** "This gives a live tactical picture without any additional clicks. Counts refresh automatically so the panel stays current."
 
 Type in the query box:
 
@@ -167,8 +186,7 @@ Read the summary aloud or let the audience read it.
 
 ### 6. Pipeline stats callout (4:30 – 5:00)
 
-Navigate to [http://localhost:8000/api/stats](http://localhost:8000/api/stats)
-or read the values off the status bar.
+Open the Intel Panel (AI INTEL button) and point to the **Fleet Analytics** section at the top — the same stats are surfaced there without leaving the app. For raw JSON, navigate to `/api/stats` on the backend.
 
 **Call out:**
 - `aircraft_count`: total aircraft in state (~7,000–9,000 depending on time of day)

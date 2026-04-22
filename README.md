@@ -1,6 +1,13 @@
 # AeroIntel
 
-**Real-time aviation intelligence platform** — Kalman filtering for state estimation, DBSCAN clustering for behavioral pattern detection, and Claude-powered natural language querying and anomaly explanation, running against live ADS-B telemetry from 10,000+ aircraft.
+**Real-time aviation intelligence platform** — Kalman filtering for state estimation, DBSCAN clustering for behavioral pattern detection, IsolationForest anomaly scoring with feature vector drill-down, and Claude-powered natural language querying and anomaly explanation, running against live ADS-B telemetry from 10,000+ aircraft.
+
+### Intel Panel
+
+- **Fleet Analytics** — polls `/api/stats` every 30s; shows live aircraft / military / anomaly / pattern counts, Kalman-tracked count, and pipeline duration
+- **Feature Vector** — clicking any anomalous aircraft displays the raw IsolationForest feature vector (altitude delta, speed delta, heading variance, vertical rate, update gap, squawk changed) alongside the Claude narrative
+- **Natural Language Filter** — Claude parses a plain-English query into structured filters applied to the live feed
+- **Situation Summary** — Claude narrates all aircraft in the current map viewport
 
 > Built by Chris Schmidt | [pcschmidt.github.io](https://pcschmidt.github.io)
 
@@ -34,7 +41,7 @@ flowchart LR
     end
     subgraph frontend["Next.js Frontend"]
         MAP["MapLibre GL\nlive aircraft layer"]
-        IP["IntelPanel\nNL query + summary"]
+        IP["IntelPanel\nfleet analytics + NL query + summary"]
         DP["DetailPanel\nanomaly explanation"]
     end
 

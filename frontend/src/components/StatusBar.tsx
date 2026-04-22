@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from "react";
-import { AircraftFeature, fetchAnomalyExplanation } from "@/lib/api";
+import { AircraftFeature, AnomalyExplanation, fetchAnomalyExplanation } from "@/lib/api";
 
 interface StatusBarProps {
   connected: boolean;
@@ -157,20 +157,20 @@ interface DetailPanelProps {
 export function DetailPanel({ aircraft, onClose }: DetailPanelProps) {
   const p = aircraft.properties;
 
-  // Fetch LLM explanation when an anomalous aircraft is selected
-  const [explanation, setExplanation] = useState<string | null>(null);
+  // Fetch LLM explanation + feature vector when an anomalous aircraft is selected
+  const [explainData, setExplainData] = useState<AnomalyExplanation | null>(null);
   const [explainLoading, setExplainLoading] = useState(false);
 
   useEffect(() => {
     if (!p.has_anomaly) {
-      setExplanation(null);
+      setExplainData(null);
       return;
     }
-    setExplanation(null);
+    setExplainData(null);
     setExplainLoading(true);
     fetchAnomalyExplanation(p.icao24)
-      .then((r) => setExplanation(r.explanation))
-      .catch(() => setExplanation(null))
+      .then((r) => setExplainData(r))
+      .catch(() => setExplainData(null))
       .finally(() => setExplainLoading(false));
   }, [p.icao24, p.has_anomaly]);
 
@@ -252,10 +252,29 @@ export function DetailPanel({ aircraft, onClose }: DetailPanelProps) {
                   Asking Claude...
                 </div>
               )}
-              {explanation && !explainLoading && (
-                <div className="text-[#8ab4d4] font-mono text-[10px] mt-1.5 leading-relaxed max-w-[220px]">
-                  {explanation}
-                </div>
+              {explainData && !explainLoading && (
+                <>
+                  {/* IsolationForest feature vector */}
+                  <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-0.5">
+                    {[
+                      { label: "ALT Δ",   value: `${(explainData.features.altitude_delta_ft  as number ?? 0).toFixed(0)} ft` },
+                      { label: "SPD Δ",   value: `${(explainData.features.speed_delta_kts     as number ?? 0).toFixed(1)} kts` },
+                      { label: "HDG VAR", value:  (explainData.features.heading_variance      as number ?? 0).toFixed(3) },
+                      { label: "V/S",     value: `${(explainData.features.vertical_rate_fpm   as number ?? 0).toFixed(0)} fpm` },
+                      { label: "GAP",     value: `${(explainData.features.update_gap_s        as number ?? 0).toFixed(0)}s` },
+                      { label: "SQUAWK",  value:  (explainData.features.squawk_changed as boolean) ? "CHANGED" : "stable" },
+                    ].map(({ label, value }) => (
+                      <div key={label} className="flex justify-between gap-1">
+                        <span className="text-[#2a4a5a] font-mono text-[8px]">{label}</span>
+                        <span className="text-[#6a8a9a] font-mono text-[8px]">{value}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Claude narrative */}
+                  <div className="text-[#8ab4d4] font-mono text-[10px] mt-2 leading-relaxed max-w-[220px]">
+                    {explainData.explanation}
+                  </div>
+                </>
               )}
             </div>
           </>
