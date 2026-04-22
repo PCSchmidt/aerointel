@@ -9,16 +9,17 @@
  */
 
 import { useState, useEffect } from "react";
-import { submitNLQuery, fetchRegionSummary, fetchStats, SituationSummary, ViewportBounds, PipelineStats } from "@/lib/api";
+import { submitNLQuery, fetchRegionSummary, fetchStats, SituationSummary, ViewportBounds, PipelineStats, AircraftFeature } from "@/lib/api";
 
 interface IntelPanelProps {
   aircraftCount: number;
   onFilterApply: (filters: Record<string, unknown>, explanation: string) => void;
   onClose: () => void;
   viewportBounds?: ViewportBounds;
+  aircraftFeatures?: AircraftFeature[];
 }
 
-export default function IntelPanel({ aircraftCount, onFilterApply, onClose, viewportBounds }: IntelPanelProps) {
+export default function IntelPanel({ aircraftCount, onFilterApply, onClose, viewportBounds, aircraftFeatures }: IntelPanelProps) {
   const [nlQuery, setNlQuery] = useState("");
   const [queryLoading, setQueryLoading] = useState(false);
   const [queryError, setQueryError] = useState<string | null>(null);
@@ -29,6 +30,7 @@ export default function IntelPanel({ aircraftCount, onFilterApply, onClose, view
   const [summaryError, setSummaryError] = useState<string | null>(null);
 
   const [pipelineStats, setPipelineStats] = useState<PipelineStats | null>(null);
+  const [showPatternList, setShowPatternList] = useState(false);
 
   // Poll pipeline stats every 30s
   useEffect(() => {
@@ -111,17 +113,77 @@ export default function IntelPanel({ aircraftCount, onFilterApply, onClose, view
             <>
               <div className="grid grid-cols-2 gap-x-3 gap-y-2 mb-3">
                 {[
-                  { label: "AIRCRAFT",  value: pipelineStats.aircraft_count, color: "#4a9eff" },
-                  { label: "MILITARY",  value: pipelineStats.military_count,  color: "#ff4a4a" },
-                  { label: "ANOMALIES", value: pipelineStats.anomaly_count,   color: pipelineStats.anomaly_count > 0 ? "#ff6600" : "#3a5a6a" },
-                  { label: "PATTERNS",  value: pipelineStats.pattern_count,   color: pipelineStats.pattern_count > 0 ? "#ffb800" : "#3a5a6a" },
-                ].map(({ label, value, color }) => (
-                  <div key={label} className="bg-[#070a0e] border border-[#1e2a38] px-2 py-1.5">
-                    <div className="text-[#3a5a6a] font-mono text-[8px] uppercase tracking-wider">{label}</div>
-                    <div className="font-mono text-sm mt-0.5" style={{ color }}>{value}</div>
-                  </div>
+                  { label: "AIRCRAFT",  value: pipelineStats.aircraft_count, color: "#4a9eff",  clickable: false },
+                  { label: "MILITARY",  value: pipelineStats.military_count,  color: "#ff4a4a", clickable: false },
+                  { label: "ANOMALIES", value: pipelineStats.anomaly_count,   color: pipelineStats.anomaly_count > 0 ? "#ff6600" : "#3a5a6a", clickable: false },
+                  { label: "PATTERNS",  value: pipelineStats.pattern_count,   color: pipelineStats.pattern_count > 0 ? "#ffb800" : "#3a5a6a", clickable: true },
+                ].map(({ label, value, color, clickable }) => (
+                  clickable ? (
+                    <button
+                      key={label}
+                      onClick={() => setShowPatternList((v) => !v)}
+                      className="bg-[#070a0e] border border-[#1e2a38] px-2 py-1.5 text-left w-full hover:border-[#ffb800]/40 transition-colors"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="text-[#3a5a6a] font-mono text-[8px] uppercase tracking-wider">{label}</div>
+                        <div className="text-[#3a5a6a] font-mono text-[8px]">{showPatternList ? "▾" : "▸"}</div>
+                      </div>
+                      <div className="font-mono text-sm mt-0.5" style={{ color }}>{value}</div>
+                    </button>
+                  ) : (
+                    <div key={label} className="bg-[#070a0e] border border-[#1e2a38] px-2 py-1.5">
+                      <div className="text-[#3a5a6a] font-mono text-[8px] uppercase tracking-wider">{label}</div>
+                      <div className="font-mono text-sm mt-0.5" style={{ color }}>{value}</div>
+                    </div>
+                  )
                 ))}
               </div>
+
+              {/* ── Pattern aircraft list ── */}
+              {showPatternList && (() => {
+                const patterned = (aircraftFeatures ?? []).filter((f) => f.properties.pattern_label);
+                const BADGE: Record<string, string> = {
+                  holding:   "#4a9eff",
+                  racetrack: "#ffb800",
+                  orbit:     "#34d399",
+                };
+                return (
+                  <div className="mb-2">
+                    <div className="text-[#3a5a6a] font-mono text-[8px] uppercase tracking-wider mb-1.5">
+                      Pattern aircraft ({patterned.length})
+                    </div>
+                    {patterned.length === 0 ? (
+                      <div className="text-[#2a4a5a] font-mono text-[9px]">No pattern aircraft in current view</div>
+                    ) : (
+                      <div className="max-h-48 overflow-y-auto flex flex-col gap-0.5 pr-1">
+                        {patterned.map((f) => {
+                          const p = f.properties;
+                          const badgeColor = BADGE[p.pattern_label ?? ""] ?? "#8ab4d4";
+                          return (
+                            <div
+                              key={p.icao24}
+                              className="flex items-center justify-between bg-[#070a0e] border border-[#1e2a38] px-2 py-1"
+                            >
+                              <div>
+                                <div className="font-mono text-[10px] text-[#8ab4d4]">
+                                  {p.callsign || p.icao24}
+                                </div>
+                                <div className="font-mono text-[8px] text-[#3a5a6a]">{p.icao24}</div>
+                              </div>
+                              <div
+                                className="font-mono text-[8px] uppercase px-1.5 py-0.5 border"
+                                style={{ color: badgeColor, borderColor: `${badgeColor}40` }}
+                              >
+                                {p.pattern_label}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
               <div className="flex flex-col gap-1.5">
                 <div className="flex justify-between text-[9px] font-mono">
                   <span className="text-[#3a5a6a]">Kalman tracked</span>

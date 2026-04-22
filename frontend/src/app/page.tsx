@@ -187,6 +187,7 @@ export default function Dashboard() {
           onFilterApply={handleFilterApply}
           onClose={() => setIntelPanelOpen(false)}
           viewportBounds={viewportBounds ?? undefined}
+          aircraftFeatures={filteredFeatures}
         />
       </div>
 
