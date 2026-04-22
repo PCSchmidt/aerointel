@@ -130,6 +130,8 @@
 - [ ] Screenshot map with Fleet Analytics panel visible
 - [ ] Confirm portfolio card metrics match evidence
 
-### 5.4 Pattern Drill-Down (A3)
-- [ ] Make pattern count in Fleet Analytics clickable
-- [ ] Filter aircraft list to `pattern_label !== null` and display in panel
+### 5.4 Pattern Drill-Down (A3) — DONE
+- [x] Make pattern count in Fleet Analytics clickable (toggle ▸/▾)
+- [x] Pass `aircraftFeatures` prop from `page.tsx` to `IntelPanel`
+- [x] Filter to `pattern_label !== null`, render scrollable list with ICAO, callsign, and color-coded badge (holding=blue, racetrack=yellow, orbit=green)
+- [x] Max-height 48 with overflow-y-auto to handle large pattern counts
